@@ -22,11 +22,14 @@ public class Interpreter {
                     case "assign":
                         switch (arr[i + 2]) {
                             case "input":
-                                values.put(arr[i + 1], input());
+                                assign(arr[i + 1], input());
                             case "readFile":
-                                values.put(arr[i + 1], readFile(arr[i + 3]));
+                                assign(arr[i + 1], readFile(arr[i + 3]));
                             default:
-                                values.put(arr[i + 1], arr[i + 2]);
+                                if (!values.containsKey(arr[i + 1]))
+                                    assign(arr[i + 1], arr[i + 2]);
+                                else
+                                    assign(arr[i + 1], values.get(arr[i + 2]));
                         }
                         break;
 
@@ -37,7 +40,10 @@ public class Interpreter {
                             case "readFile":
                                 print(readFile(arr[i + 2]));
                             default:
-                                print(arr[i + 1]);
+                                if (!values.containsKey(arr[i + 1]))
+                                    print(arr[i + 1]);
+                                else
+                                    print(values.get(arr[i + 1]));
                                 break;
                         }
                     case "add":
@@ -64,8 +70,8 @@ public class Interpreter {
         return br.readLine();
     }
 
-    private void assign() {
-
+    private void assign(String assignee, String assigned) {
+        values.put(assignee, assigned);
     }
 
     private void add(String a, String b) {
