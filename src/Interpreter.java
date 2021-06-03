@@ -10,6 +10,7 @@ public class Interpreter {
 
         }
     }
+    public Interpreter(){}
 
     private void parser(String path) throws IOException {
         FileReader fileReader = new FileReader(path);
@@ -75,18 +76,30 @@ public class Interpreter {
     }
 
     private void add(String a, String b) {
+        values.put(a, values.get(a) + values.get(b));
+    }
+
+    private String readFile(String fileName) throws IOException {
+        BufferedReader br = new BufferedReader(new FileReader(fileName));
+        String curLine = "";
+        String text = "";
+        while ((curLine = br.readLine())!=null)
+            text += curLine + "\n";
+
+        return text;
+    }
+
+    private void writeFile(String fileName, String data) throws IOException {
+        String oldData = "";
+        try {
+            oldData = readFile(fileName);
+        }catch ( IOException e){
+
+        }
+        FileWriter fileWriter = new FileWriter(fileName);
+        fileWriter.write(oldData + data);
+        fileWriter.close();
 
     }
 
-    private String readFile(String fileName) {
-        return "";
-    }
-
-    private void writeFile(String fileName, String data) {
-
-    }
-
-    public static void main(String[] args) {
-
-    }
 }
