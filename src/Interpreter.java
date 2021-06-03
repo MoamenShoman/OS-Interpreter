@@ -93,7 +93,7 @@ public class Interpreter {
         String oldData = "";
         try {
             oldData = readFile(fileName);
-        }catch ( IOException e){
+        }catch ( IOException ignored){
 
         }
         FileWriter fileWriter = new FileWriter(fileName);
