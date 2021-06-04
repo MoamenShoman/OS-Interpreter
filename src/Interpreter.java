@@ -7,7 +7,6 @@ public class Interpreter {
     public Interpreter(String[] paths) {
         values = new Hashtable<>();
         for (String path : paths) {
-
         }
     }
     public Interpreter(){}
