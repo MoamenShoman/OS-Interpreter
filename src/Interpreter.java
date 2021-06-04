@@ -75,7 +75,7 @@ public class Interpreter {
 
     public static void main(String[] args) throws IOException {
         Interpreter i = new Interpreter();
-      //  i.parser("Program 1.txt");
+        i.parser("Program 1.txt");
         i.parser("Program 2.txt");
         i.parser("Program 3.txt");
     }
