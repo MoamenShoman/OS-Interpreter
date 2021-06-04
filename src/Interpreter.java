@@ -2,16 +2,15 @@ import java.io.*;
 import java.util.Hashtable;
 
 public class Interpreter {
-    Hashtable<String, String> values;
 
-    public Interpreter(String[] paths) {
-        values = new Hashtable<>();
-        for (String path : paths) {
-        }
+    private OS os;
+
+
+    public Interpreter() throws IOException {
+        os = new OS();
     }
-    public Interpreter(){}
 
-    private void parser(String path) throws IOException {
+    public void parser(String path) throws IOException {
         FileReader fileReader = new FileReader(path);
         BufferedReader br = new BufferedReader(fileReader);
         String line;
@@ -22,83 +21,62 @@ public class Interpreter {
                     case "assign":
                         switch (arr[i + 2]) {
                             case "input":
-                                assign(arr[i + 1], input());
+                                assign(arr[i + 1], os.input());
+                                break;
                             case "readFile":
-                                assign(arr[i + 1], readFile(arr[i + 3]));
+                                assign(arr[i + 1], os.readFile(os.readMemory(arr[i + 3])));
+                                break;
                             default:
-                                if (!values.containsKey(arr[i + 1]))
-                                    assign(arr[i + 1], arr[i + 2]);
-                                else
-                                    assign(arr[i + 1], values.get(arr[i + 2]));
+                                assign(arr[i + 1], os.readMemory(arr[i + 2]) );
                         }
                         break;
 
                     case "print":
                         switch (arr[i + 1]) {
                             case "input":
-                                print(input());
+                                os.print(os.input());
+                                break;
                             case "readFile":
-                                print(readFile(arr[i + 2]));
+                                os.print(os.readFile(os.readMemory(arr[i + 2])));
+                                break;
                             default:
-                                if (!values.containsKey(arr[i + 1]))
-                                    print(arr[i + 1]);
-                                else
-                                    print(values.get(arr[i + 1]));
+                                os.print(os.readMemory(arr[i + 1]));
                                 break;
                         }
+                        break;
                     case "add":
                         add(arr[i + 1], arr[i + 2]);
+                        break;
 
                     case "readFile":
-                        readFile(arr[i + 1]);
+                        os.readFile(os.readMemory(arr[i + 1]));
+                        break;
 
                     case "writeFile":
-                        writeFile(arr[i + 1], arr[i + 2]);
+                        os.writeFile(arr[i + 1], os.readMemory(arr[i + 2]));
+                        break;
                 }
             }
-
         }
-
-    }
-
-    private void print(String s) {
-        System.out.println(s);
-    }
-
-    private String input() throws IOException {
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        return br.readLine();
     }
 
     private void assign(String assignee, String assigned) {
-        values.put(assignee, assigned);
+        os.writeMemory(assignee, assigned);
     }
 
     private void add(String a, String b) {
-        values.put(a, values.get(a) + values.get(b));
+
+        int x = Integer.parseInt(os.readMemory(a));
+        int y = Integer.parseInt(os.readMemory(b));
+
+        int z = x + y;
+        os.writeMemory(a, ""+z);
     }
 
-    private String readFile(String fileName) throws IOException {
-        BufferedReader br = new BufferedReader(new FileReader(fileName));
-        String curLine = "";
-        String text = "";
-        while ((curLine = br.readLine())!=null)
-            text += curLine + "\n";
-
-        return text;
+    public static void main(String[] args) throws IOException {
+        Interpreter i = new Interpreter();
+      //  i.parser("Program 1.txt");
+        i.parser("Program 2.txt");
+        i.parser("Program 3.txt");
     }
-
-    private void writeFile(String fileName, String data) throws IOException {
-        String oldData = "";
-        try {
-            oldData = readFile(fileName);
-        }catch ( IOException ignored){
-
-        }
-        FileWriter fileWriter = new FileWriter(fileName);
-        fileWriter.write(oldData + data);
-        fileWriter.close();
-
-    }
-
 }
