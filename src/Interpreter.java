@@ -1,13 +1,19 @@
 import java.io.*;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 public class Interpreter {
 
     private final OS os;
     private int curProcessID;
-    private int[] quanta;
+
+    private ArrayList<Integer>[]quanta;
 
     public Interpreter() throws IOException {
-        quanta = new int[3];
+        quanta = new ArrayList[3];
+        for (int i = 0; i < 3;i++)
+            quanta[i] = new ArrayList<>();
+
         os = new OS();
         scheduler();
     }
@@ -68,18 +74,24 @@ public class Interpreter {
         while (!os.readyQueue.isEmpty()) {
 
             curProcessID = os.readyQueue.poll();
-            quanta[curProcessID - 1]++;
+            int quantaCount = 0;
+
             os.updateState(curProcessID, "Running");
             int pc = os.getPC(curProcessID);
 
             parser((String) os.memory[pc]);
+            quantaCount++;
             pc++;
 
             if (os.memory[pc] == null) {
 
                 os.updatePC(curProcessID, pc);
                 os.updateState(curProcessID, "Finished");
-                System.out.println("Process " + curProcessID + " finished in " + quanta[curProcessID - 1] + " quanta.");
+                quanta[curProcessID - 1].add(quantaCount);
+
+                System.out.println("Process " + curProcessID + " finished in " + quanta[curProcessID - 1].size() +
+                        " quanta as follows --> " + quanta[curProcessID - 1]);
+
                 System.out.println("--------------------------------------------");
                 System.out.println();
                 continue;
@@ -87,10 +99,13 @@ public class Interpreter {
 
             parser((String) os.memory[pc]);
             pc++;
+            quantaCount++;
+            quanta[curProcessID - 1].add(quantaCount);
             os.updatePC(curProcessID, pc);
             if (os.memory[pc] == null) {
                 os.updateState(curProcessID, "Finished");
-                System.out.println("Process " + curProcessID + " finished in " + quanta[curProcessID - 1] + " quanta.");
+                System.out.println("Process " + curProcessID + " finished in " + quanta[curProcessID - 1].size() +
+                        " quanta as follows --> " + quanta[curProcessID - 1]);
                 System.out.println("--------------------------------------------");
                 System.out.println();
                 continue;
